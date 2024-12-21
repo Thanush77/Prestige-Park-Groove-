@@ -1,0 +1,1186 @@
+// import 'package:flutter/material.dart';
+// import 'package:flutter/widgets.dart';
+// import 'package:flutter_pdfview/flutter_pdfview.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'dart:io';
+
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Sustainable Infra Development',
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//         visualDensity: VisualDensity.adaptivePlatformDensity,
+//       ),
+//       home: const LoginPage(),
+//     );
+//   }
+// }
+
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({super.key});
+
+//   @override
+//   State<LoginPage> createState() => _LoginPageState();
+// }
+
+// class _LoginPageState extends State<LoginPage> {
+//   final TextEditingController _usernameController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+
+//   void _login() {
+//     if (_usernameController.text == 'admin' && _passwordController.text == 'password') {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => const MyHomePage()),
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Invalid credentials')),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Login'),
+//       ),
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             TextField(
+//               controller: _usernameController,
+//               decoration: const InputDecoration(
+//                 labelText: 'Username',
+//                 border: OutlineInputBorder(),
+//                 prefixIcon: Icon(Icons.person),
+//               ),
+//             ),
+//             const SizedBox(height: 20),
+//             TextField(
+//               controller: _passwordController,
+//               decoration: const InputDecoration(
+//                 labelText: 'Password',
+//                 border: OutlineInputBorder(),
+//                 prefixIcon: Icon(Icons.lock),
+//               ),
+//               obscureText: true,
+//             ),
+//             const SizedBox(height: 30),
+//             ElevatedButton(onPressed: _login, child: const Text('Login')),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class MyHomePage extends StatelessWidget {
+//   const MyHomePage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Sustainable Infra Development'),
+//       ),
+//       drawer: const CustomDrawer(),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Text('Sustainable Infra Development', style: TextStyle(fontSize: 24)),
+//             Image.asset('assets/prestigelogo.png', height: 60), // Replace with your logo
+//             const Text('Add Prestige to your life'),
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceAround,
+//               children: [
+//                 Image.asset('assets/iisclogo.png', height: 60), // Replace with your logo
+//                 Image.asset('assets/L&T.png', height: 60), // Replace with your logo
+//               ],
+//             ),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () {},
+//               child: const Text('PARK GROOVE'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class CustomDrawer extends StatelessWidget {
+//   const CustomDrawer({super.key});
+
+//   Future<void> _launchURL(String urlString) async {
+//     final Uri url = Uri.parse(urlString);
+//     if (await canLaunchUrl(url)) {
+//       await launchUrl(url, mode: LaunchMode.externalApplication);
+//     } else {
+//       throw 'Could not launch $url';
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Drawer(
+//       child: ListView(
+//         padding: EdgeInsets.zero,
+//         children: [
+//           const DrawerHeader(
+//             decoration: BoxDecoration(color: Colors.blue),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text('Sustainable Infra Development', style: TextStyle(color: Colors.white, fontSize: 20)),
+//                 SizedBox(height: 5),
+//                 Text('EEPl St Jones chruch Road Banglore 560001', style: TextStyle(color: Colors.white)),
+//                 SizedBox(height: 5),
+//                 Text('thanush@gmail.com', style: TextStyle(color: Colors.white)),
+//               ],
+//             ),
+//           ),
+//           ListTile(title: const Text('Home'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const MyHomePage()))),
+//           ListTile(title: const Text('Water Consumption'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const WaterConsumptionPage()))),
+//           ListTile(title: const Text('Air Pollution'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BlankPage(title: 'Air Pollution')))),
+//           ListTile(title: const Text('Solid Waste'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BlankPage(title: 'Solid Waste')))),
+//           ListTile(title: const Text('Ground Water'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BlankPage(title: 'Ground Water')))),
+//           ListTile(title: const Text('Rain Water'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BlankPage(title: 'Rain Water')))),
+//           ListTile(title: const Text('About Us'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const BlankPage(title: 'About Us')))),
+//           ListTile(title: const Text('Approvals'), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ApprovalsPage()))),
+//           const Divider(),
+//           ListTile(title: const Text('Logout'), onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()))),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class BlankPage extends StatelessWidget {
+//   final String title;
+
+//   const BlankPage({super.key, required this.title});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(title),
+//       ),
+//       body: Center(child: Text('Welcome to $title Page!')),
+//     );
+//   }
+// }
+
+// class ApprovalsPage extends StatelessWidget {
+//   const ApprovalsPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Approvals'),
+//       ),
+//       body: ListView(
+//         padding: const EdgeInsets.all(16.0),
+//         children: [
+//           const Text('Select Approval Type:', style: TextStyle(fontSize: 20)),
+//           const SizedBox(height: 16),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/1.pdf')));
+//             },
+//             child: const Text('Environmental Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/2.pdf')));
+//             },
+//             child: const Text('BBMP Plan Sanction Paper'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/3.pdf')));
+//             },
+//             child: const Text('Land Document'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/4.pdf')));
+//             },
+//             child: const Text('SGWA'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/5.pdf')));
+//             },
+//             child: const Text('Fire NOC'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/6.pdf')));
+//             },
+//             child: const Text('Airport Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/7.pdf')));
+//             },
+//             child: const Text('BESCOM'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const KSPCBPage()));
+//             },
+//             child: const Text('KSPCB'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class KSPCBPage extends StatelessWidget {
+//   const KSPCBPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('KSPCB'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Text('KSPCB Approvals', style: TextStyle(fontSize: 24)),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const BlankPage(title: 'Approval 1')),
+//                 );
+//               },
+//               child: const Text('Approval 1'),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const BlankPage(title: 'Approval 2')),
+//                 );
+//               },
+//               child: const Text('Approval 2'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class PDFViewPage extends StatelessWidget {
+//   final String assetPath;
+
+//   const PDFViewPage({super.key, required this.assetPath});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('PDF Viewer'),
+//       ),
+//       body: PDFView(
+//         filePath: assetPath,
+//       ),
+//     );
+//   }
+// }
+
+// class WaterConsumptionPage extends StatelessWidget {
+//   const WaterConsumptionPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Water Consumption'),
+//       ),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ProjectLabourColonyPage())),
+//           child: const Text('Project and Labour Colony'),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class ProjectLabourColonyPage extends StatelessWidget {
+//   const ProjectLabourColonyPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Project and Labour Colony'),
+//       ),
+//       body: ListView(
+//         padding: const EdgeInsets.all(16.0),
+//         children: [
+//           ElevatedButton(
+//             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SourcePage())),
+//             child: const Text('Source'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ConsumptionPage())),
+//             child: const Text('Consumption'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SewagePage())),
+//             child: const Text('Sewage'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class SourcePage extends StatelessWidget {
+//   const SourcePage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Source'),
+//       ),
+//       body: ListView(
+//         padding: const EdgeInsets.all(16.0),
+//         children: [
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/1.pdf'), // Replace with your PDF path
+//             child: const Text('Borewell'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/2.pdf'), // Replace with your PDF path
+//             child: const Text('BWSSB'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/3.pdf'), // Replace with your PDF path
+//             child: const Text('Tankers'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class ConsumptionPage extends StatelessWidget {
+//   const ConsumptionPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Consumption'),
+//       ),
+//       body: const Center(child: Text('Consumption details go here')),
+//     );
+//   }
+// }
+
+// class SewagePage extends StatelessWidget {
+//   const SewagePage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Sewage'),
+//       ),
+//       body: const Center(child: Text('Sewage details go here')),
+//     );
+//   }
+// }
+
+// class PDFViewPage extends StatelessWidget {
+//   final String assetPath;
+
+//   const PDFViewPage({super.key, required this.assetPath});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('PDF Viewer')),
+//       body: Center(child: Text('Displaying PDF from: $assetPath')),
+//     );
+//   }
+// }
+
+// class ApprovalsPage extends StatelessWidget {
+//   const ApprovalsPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Approvals'),
+//       ),
+//       body: ListView(
+//         padding: const EdgeInsets.all(16.0),
+//         children: [
+//           const Text('Select Approval Type:', style: TextStyle(fontSize: 20)),
+//           const SizedBox(height: 16),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/1.pdf'), // Update path
+//             child: const Text('Environmental Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/2.pdf'), // Update path
+//             child: const Text('BBMP Plan Sanction Paper'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/3.pdf'), // Update path
+//             child: const Text('Land Document'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/4.pdff'), // Update path
+//             child: const Text('SGWA'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/5.pdf'), // Update path
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/6.pdf'), // Update path
+//             child: const Text('Airport Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => _openPDF(context, 'assets/7.pdf'), // Update path
+//             child: const Text('BESCOM'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const KSPCBPage())),
+//             child: const Text('KSPCB'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+
+//   void _openPDF(BuildContext context, String assetPath) async {
+//     bool viewerInstalled = false; // Simulate check for PDF viewer; implement real logic as needed
+
+//     if (!viewerInstalled) {
+//       showDialog(
+//         context: context,
+//         builder: (BuildContext context) {
+//           return AlertDialog(
+//             title: const Text("PDF Viewer Required"),
+//             content: const Text("Please install a PDF viewer to view this document."),
+//             actions: [
+//               TextButton(
+//                 child: const Text("Download PDF Viewer"),
+//                 onPressed: () {
+//                   // Redirect to download the PDF viewer; e.g., link to Play Store
+//                   Navigator.of(context).pop();
+//                 },
+//               ),
+//               TextButton(
+//                 child: const Text("Cancel"),
+//                 onPressed: () {
+//                   Navigator.of(context).pop();
+//                 },
+//               ),
+//             ],
+//           );
+//         },
+//       );
+//     } else {
+//       // Logic to open the PDF file if viewer installed
+//       Navigator.push(context, MaterialPageRoute(builder: (context) => PDFViewPage(assetPath: assetPath)));
+//     }
+//   }
+// }
+
+// class KSPCBPage extends StatelessWidget {
+//   const KSPCBPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('KSPCB'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Text('KSPCB Approvals', style: TextStyle(fontSize: 24)),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () => _openPDF(context, 'assets/8.pdf'), // Update path
+//               child: const Text('CFE Copy'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+
+
+
+
+
+
+
+// newer one 05/11/24 10:10 PM
+
+
+// import 'package:flutter/material.dart';
+// import 'package:url_launcher/url_launcher.dart';
+// import 'package:flutter_pdfview/flutter_pdfview.dart';
+// void main() {
+//   runApp(const MyApp());
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       title: 'Namer App',
+//       theme: ThemeData(
+//         useMaterial3: true,
+//         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 33, 174, 184)),
+//       ),
+//       home: const LoginPage(),
+//     );
+//   }
+// }
+
+// class LoginPage extends StatefulWidget {
+//   const LoginPage({Key? key}) : super(key: key);
+
+//   @override
+//   State<LoginPage> createState() => _LoginPageState();
+// }
+
+// class _LoginPageState extends State<LoginPage> {
+//   final TextEditingController _usernameController = TextEditingController();
+//   final TextEditingController _passwordController = TextEditingController();
+
+//   Future<void> _openWebsite(String url) async {
+//     if (await canLaunch(url)) {
+//       await launch(url);
+//     } else {
+//       throw 'Could not open $url';
+//     }
+//   }
+
+//   void _login() {
+//     if (_usernameController.text == 'thanush' &&
+//         _passwordController.text == 'user_123') {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => const MyHomePage()),
+//       );
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(content: Text('Invalid credentials')),
+//       );
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Sustainable Infra Development'),
+//         backgroundColor: Colors.teal,
+//       ),
+//       body: Center(
+//         child: SingleChildScrollView(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             children: [
+//               // Logos section
+//               Column(
+//                 children: [
+//                   GestureDetector(
+//                     onTap: () => _openWebsite('https://www.prestigeconstructions.com'),
+//                     child: Image.asset('assets/prestigelogo.png', height: 80, fit: BoxFit.cover),
+//                   ),
+//                   const SizedBox(height: 20),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       GestureDetector(
+//                         onTap: () => _openWebsite('https://www.iisc.ac.in'),
+//                         child: Image.asset('assets/iisclogo.png', height: 80, fit: BoxFit.cover),
+//                       ),
+//                       const SizedBox(width: 16),
+//                       GestureDetector(
+//                         onTap: () => _openWebsite('https://www.larsentoubro.com'),
+//                         child: Image.asset('assets/L&T.png', height: 80, fit: BoxFit.cover),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 30),
+
+//               // Login card
+//               Card(
+//                 elevation: 8,
+//                 margin: const EdgeInsets.symmetric(horizontal: 16),
+//                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+//                 child: Padding(
+//                   padding: const EdgeInsets.all(20.0),
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.center,
+//                     children: [
+//                       const Text(
+//                         'Sustainable Infra Development',
+//                         style: TextStyle(
+//                           fontSize: 24,
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.black87,
+//                         ),
+//                         textAlign: TextAlign.center,
+//                       ),
+//                       const SizedBox(height: 8),
+//                       const Text(
+//                         'Icon Group Bangalore',
+//                         style: TextStyle(
+//                           fontSize: 16,
+//                           fontWeight: FontWeight.bold,
+//                           color: Colors.black54,
+//                         ),
+//                         textAlign: TextAlign.center,
+//                       ),
+//                       const SizedBox(height: 20),
+//                       TextField(
+//                         controller: _usernameController,
+//                         decoration: const InputDecoration(
+//                           labelText: 'Username',
+//                           border: OutlineInputBorder(),
+//                           prefixIcon: Icon(Icons.person),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 16),
+//                       TextField(
+//                         controller: _passwordController,
+//                         obscureText: true,
+//                         decoration: const InputDecoration(
+//                           labelText: 'Password',
+//                           border: OutlineInputBorder(),
+//                           prefixIcon: Icon(Icons.lock),
+//                         ),
+//                       ),
+//                       const SizedBox(height: 20),
+//                       ElevatedButton(
+//                         onPressed: _login,
+//                         style: ElevatedButton.styleFrom(
+//                           padding: const EdgeInsets.symmetric(vertical: 15),
+//                           backgroundColor: Colors.teal,
+//                         ),
+//                         child: const Text('Login', style: TextStyle(fontSize: 18)),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//               const SizedBox(height: 20),
+
+//               // Sign-up text
+//               const Text(
+//                 'Not yet registered? Sign up now',
+//                 style: TextStyle(fontSize: 14, color: Colors.black87),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+// class MyHomePage extends StatelessWidget {
+//   const MyHomePage({super.key});
+
+//   // Function to open URLs in the default browser
+//   Future<void> _openWebsite(String url) async {
+//     final Uri uri = Uri.parse(url);
+//     if (await canLaunchUrl(uri)) {
+//       await launchUrl(uri, mode: LaunchMode.externalApplication);
+//     } else {
+//       throw 'Could not launch $url';
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Home Page'),
+//         backgroundColor: Colors.green[700],
+//       ),
+//       drawer: const CustomDrawer(), // Use the CustomDrawer here
+//       body: Padding(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.center,
+//           children: [
+//             // Header Text
+//             Container(
+//               padding: const EdgeInsets.all(16.0),
+//               color: Colors.green[100],
+//               child: const Text(
+//                 'Sustainable Infra Development',
+//                 style: TextStyle(
+//                   fontSize: 24,
+//                   fontWeight: FontWeight.bold,
+//                   color: Colors.black,
+//                 ),
+//                 textAlign: TextAlign.center,
+//               ),
+//             ),
+//             const SizedBox(height: 20),
+
+//             // Logo Row with Clickable Images
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.center,
+//               children: [
+//                 InkWell(
+//                   onTap: () => _openWebsite("https://www.prestigeconstructions.com"),
+//                   child: Image.asset(
+//                     'assets/prestigelogo.png',
+//                     width: 100,
+//                     height: 80,
+//                     fit: BoxFit.contain,
+//                   ),
+//                 ),
+//                 const SizedBox(width: 20),
+//                 InkWell(
+//                   onTap: () => _openWebsite("https://www.iisc.ac.in"),
+//                   child: Image.asset(
+//                     'assets/iisclogo.png',
+//                     width: 100,
+//                     height: 80,
+//                     fit: BoxFit.contain,
+//                   ),
+//                 ),
+//                 const SizedBox(width: 20),
+//                 InkWell(
+//                   onTap: () => _openWebsite("https://www.larsentoubro.com"),
+//                   child: Image.asset(
+//                     'assets/L&T.png',
+//                     width: 100,
+//                     height: 80,
+//                     fit: BoxFit.contain,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             const Spacer(),
+
+//             // 'Park Grove' Button
+//             ElevatedButton(
+//               onPressed: () {
+//                 // Action for Park Grove button
+//               },
+//               style: ElevatedButton.styleFrom(
+//                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+//                 backgroundColor: Colors.green[700], 
+//                 textStyle: const TextStyle(fontSize: 28),
+//               ),
+//               child: const Text('Park Grove'),
+//             ),
+//             const SizedBox(height: 20),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+// class CustomDrawer extends StatelessWidget {
+//   const CustomDrawer({super.key});
+
+//   Future<void> _launchURL(String urlString) async {
+//     final Uri url = Uri.parse(urlString);
+//     if (await canLaunchUrl(url)) {
+//       await launchUrl(url, mode: LaunchMode.externalApplication);
+//     } else {
+//       throw 'Could not launch $url';
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Drawer(
+//       child: ListView(
+//         padding: EdgeInsets.zero,
+//         children: [
+//           DrawerHeader(
+//             decoration: const BoxDecoration(color: Colors.blue),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 GestureDetector(
+//                   onTap: () => _launchURL('https://www.example.com'), // Replace with actual URL
+//                   child: Image.asset(
+//                     'assets/prestigelogo.png', // Add your logo asset here
+//                     height: 60,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 10),
+//                 const Text(
+//                   'Sustainable Infra Development',
+//                   style: TextStyle(color: Colors.white, fontSize: 20),
+//                 ),
+//                 const SizedBox(height: 5),
+//                 const Text(
+//                   'EEPl St Jones Church Road Bangalore 560001',
+//                   style: TextStyle(color: Colors.white, fontSize: 14),
+//                 ),
+//                 const Text(
+//                   'thanush@gmail.com',
+//                   style: TextStyle(color: Colors.white, fontSize: 14),
+//                 ),
+//               ],
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Home'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const MyHomePage()),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Approvals'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const ApprovalsPage()),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Water Consumption'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const WaterConsumptionPage()),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Air Pollution'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const BlankPage(title: 'Air Pollution')),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Solid Waste'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const BlankPage(title: 'Solid Waste')),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Ground Water'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const BlankPage(title: 'Ground Water')),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Rain Water'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const BlankPage(title: 'Rain Water')),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('About Us'),
+//             onTap: () => Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => const BlankPage(title: 'About Us')),
+//             ),
+//           ),
+//           ListTile(
+//             title: const Text('Logout'),
+//             onTap: () => Navigator.pushReplacement(
+//               context,
+//               MaterialPageRoute(builder: (context) => const LoginPage()),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class ApprovalsPage extends StatelessWidget {
+//   const ApprovalsPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Approvals'),
+//       ),
+//       body: ListView(
+//         padding: const EdgeInsets.all(16.0),
+//         children: [
+//           const Text('Select Approval Type:', style: TextStyle(fontSize: 20)),
+//           const SizedBox(height: 16),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/1.pdf')));
+//             },
+//             child: const Text('Environmental Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/2.pdf')));
+//             },
+//             child: const Text('BBMP Plan Sanction Paper'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/3.pdf')));
+//             },
+//             child: const Text('Land Document'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/4.pdf')));
+//             },
+//             child: const Text('SGWA'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/5.pdf')));
+//             },
+//             child: const Text('Fire NOC'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/6.pdf')));
+//             },
+//             child: const Text('Airport Clearances'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const PDFViewPage(assetPath: 'assets/7.pdf')));
+//             },
+//             child: const Text('BESCOM'),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Navigator.push(context, MaterialPageRoute(builder: (context) => const KSPCBPage()));
+//             },
+//             child: const Text('KSPCB'),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
+// class KSPCBPage extends StatelessWidget {
+//   const KSPCBPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('KSPCB'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             const Text('KSPCB Approvals', style: TextStyle(fontSize: 24)),
+//             const SizedBox(height: 20),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const BlankPage(title: 'Approval 1')),
+//                 );
+//               },
+//               child: const Text('Approval 1'),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const BlankPage(title: 'Approval 2')),
+//                 );
+//               },
+//               child: const Text('Approval 2'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class PDFViewPage extends StatelessWidget {
+//   final String assetPath;
+
+//   const PDFViewPage({super.key, required this.assetPath});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('PDF Viewer'),
+//       ),
+//       body: PDFView(
+//         filePath: assetPath,
+//       ),
+//     );
+//   }
+// }
+
+
+// class BlankPage extends StatelessWidget {
+//   final String title;
+
+//   const BlankPage({super.key, required this.title});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text(title),
+//       ),
+//       body: Center(
+//         child: Text('Welcome to $title Page!'),
+//       ),
+//     );
+//   }
+// }
+
+// class WaterConsumptionPage extends StatelessWidget {
+//   const WaterConsumptionPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Water Consumption'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const ProjectLabourPage()),
+//                 );
+//               },
+//               child: const Text('Project and Labour Colony'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class ProjectLabourPage extends StatelessWidget {
+//   const ProjectLabourPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Project and Labour Colony'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const ProjectOptionsPage()),
+//                 );
+//               },
+//               child: const Text('Project'),
+//             ),
+//             const SizedBox(height: 16),
+//             ElevatedButton(
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(builder: (context) => const BlankPage(title: 'Labour Colony')),
+//                 );
+//               },
+//               child: const Text('Labour Colony'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// class ProjectOptionsPage extends StatelessWidget {
+//   const ProjectOptionsPage({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Project Options'),
+//       ),
+//       body: Center(
+//         child: Column(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: [
+//             ElevatedButton(
+//               onPressed: () {
+//                 // Add your project functionality here
+//               },
+//               child: const Text('Add New Project'),
+//             ),
+//             const SizedBox(height: 16),
+//             ElevatedButton(
+//               onPressed: () {
+//                 // Add your project details functionality here
+//               },
+//               child: const Text('View Projects'),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
