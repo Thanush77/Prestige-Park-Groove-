@@ -15,14 +15,6 @@ class _ProjectsPageState extends State<ProjectsPage> {
       title: 'Prestige Park Grove',
       description: 'A sustainable residential development in Bangalore',
     ),
-    Project(
-      title: 'Environmental Management',
-      description: 'Integrated sustainability solutions',
-    ),
-    Project(
-      title: 'Water Conservation Initiative',
-      description: 'Innovative water management strategies',
-    ),
   ];
 
   void _addNewProject() {

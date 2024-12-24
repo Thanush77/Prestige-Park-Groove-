@@ -4,9 +4,9 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
-        android:label="learningdart"
+        android:label="Prestige Park Groove"
         android:name="${applicationName}"
-        android:icon="@mipmap/logo.png">
+        android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
             android:exported="true"

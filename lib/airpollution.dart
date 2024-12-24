@@ -668,8 +668,9 @@
 // }
 
 
-
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -1805,156 +1806,664 @@ import 'dart:convert';
 //   }
 // }
 
+import 'dart:convert';
 
-class AirPollutionMonitoringPage extends StatelessWidget {
+class AirPollutionMonitoringPage extends StatefulWidget {
   const AirPollutionMonitoringPage({super.key});
 
-  static const _gridItemPadding = 16.0;
-  static const _gridItemBorderRadius = 12.0;
-  static const _gridItemTitleTextStyle = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
-  );
+  @override
+  State<AirPollutionMonitoringPage> createState() => _AirPollutionMonitoringPageState();
+}
+
+class _AirPollutionMonitoringPageState extends State<AirPollutionMonitoringPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  bool _isRealTimeMonitoring = false;
+  DateTime _selectedDate = DateTime.now();
+  final List<String> _notifications = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _simulateNotifications();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _simulateNotifications() {
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) {
+        setState(() {
+          _notifications.insert(0, 'PM2.5 levels exceeded threshold at Stack 1');
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Air Pollution Control Management'),
-        backgroundColor: Colors.teal,
+      appBar: _buildAppBar(),
+      body: _buildBody(),
+      floatingActionButton: _buildFAB(),
+      endDrawer: _buildSettingsDrawer(),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar() {
+    return AppBar(
+      title: const Text('Air Pollution Control'),
+      backgroundColor: Colors.teal,
+      bottom: TabBar(
+        controller: _tabController,
+        tabs: const [
+          Tab(text: 'Overview'),
+          Tab(text: 'Analytics'),
+          Tab(text: 'Alerts'),
+        ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.teal.shade50, Colors.white],
+      actions: [
+        Builder(
+          builder: (context) => Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications),
+                onPressed: _showNotifications,
+              ),
+              if (_notifications.isNotEmpty)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 14,
+                      minHeight: 14,
+                    ),
+                    child: Text(
+                      '${_notifications.length}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 8,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(_gridItemPadding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+        Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => Scaffold.of(context).openEndDrawer(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody() {
+    return TabBarView(
+      controller: _tabController,
+      children: [
+        _buildOverviewTab(),
+        _buildAnalyticsTab(),
+        _buildAlertsTab(),
+      ],
+    );
+  }
+
+  Widget _buildOverviewTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCurrentStatus(),
+          const SizedBox(height: 24),
+          _buildRealtimeChart(),
+          const SizedBox(height: 24),
+          _buildMonitoringGrids(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMonitoringGrids() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Monitoring Stations',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 16),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount = constraints.maxWidth > 600 ? 2 : 1;
+            return GridView.count(
+              crossAxisCount: crossAxisCount,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 12,
+              crossAxisSpacing: 12,
+              childAspectRatio: 2.5,
               children: [
-                _buildStandardsGrid(context),
-                const SizedBox(height: 32),
-                _buildMonitoringGrid(context),
+                _buildMonitoringGridItem(
+                  context,
+                  'Stack Monitoring',
+                  Icons.analytics,
+                  StackMonitoringPage(),
+                ),
+                _buildMonitoringGridItem(
+                  context,
+                  'Ambient Air Monitoring',
+                  Icons.dashboard,
+                  const PlaceholderPage(title: 'Ambient Air Monitoring'),
+                ),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStandardsGrid(BuildContext context) {
-    return _buildGrid(
-      [
-        _buildStandardGridItem(
-          context,
-          'Ambient Air Quality Standards',
-          const AmbientAirQualityStandardsPage(),
-        ),
-        _buildStandardGridItem(
-          context,
-          'Stack Emission Standards',
-          const StackEmissionStandardsPage(),
-        ),
-        _buildStandardGridItem(
-          context,
-          'Noise Standards',
-          const NoiseStandardsPage(),
-        ),
-        _buildStandardGridItem(
-          context,
-          'Air Pollution Sources',
-          const AirPollutionSourcesPage(),
+            );
+          },
         ),
       ],
-    );
-  }
-
-  Widget _buildMonitoringGrid(BuildContext context) {
-    return _buildGrid(
-      [
-        _buildMonitoringGridItem(
-          context,
-          'Stack Monitoring',
-          StackMonitoringPage(),
-        ),
-        _buildMonitoringGridItem(
-          context,
-          'Ambient Air Monitoring',
-          const AmbientAirMonitoringPage(),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildGrid(List<Widget> children) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      mainAxisSpacing: _gridItemPadding,
-      crossAxisSpacing: _gridItemPadding,
-      childAspectRatio: 3,
-      children: children,
-    );
-  }
-
-  Widget _buildStandardGridItem(
-    BuildContext context,
-    String title,
-    Widget page,
-  ) {
-    return _buildGridItem(
-      context,
-      title,
-      page,
-      Colors.teal.shade400,
     );
   }
 
   Widget _buildMonitoringGridItem(
     BuildContext context,
     String title,
+    IconData icon,
     Widget page,
   ) {
-    return _buildGridItem(
-      context,
-      title,
-      page,
-      Colors.teal.shade600,
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => page),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.teal.shade600,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 24,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildGridItem(
-    BuildContext context,
-    String title,
-    Widget page,
-    Color backgroundColor,
-  ) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        padding: const EdgeInsets.symmetric(vertical: _gridItemPadding),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_gridItemBorderRadius),
+  Widget _buildCurrentStatus() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Current Status',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatusIndicator('PM2.5', '35 µg/m³', Colors.orange),
+                _buildStatusIndicator('PM10', '75 µg/m³', Colors.red),
+                _buildStatusIndicator('SO2', '40 ppb', Colors.green),
+              ],
+            ),
+          ],
         ),
       ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
+    );
+  }
+
+  Widget _buildStatusIndicator(String label, String value, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRealtimeChart() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Real-time Monitoring',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Switch(
+                  value: _isRealTimeMonitoring,
+                  onChanged: (value) {
+                    setState(() {
+                      _isRealTimeMonitoring = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                _mainData(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  LineChartData _mainData() {
+    return LineChartData(
+      gridData: FlGridData(show: true),
+      titlesData: FlTitlesData(
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 22,
+            getTitlesWidget: (value, meta) {
+              return Text(
+                '${value.toInt()}h',
+                style: const TextStyle(fontSize: 12),
+              );
+            },
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 28,
+            getTitlesWidget: (value, meta) {
+              return Text(
+                '${value.toInt()}',
+                style: const TextStyle(fontSize: 12),
+              );
+            },
+          ),
+        ),
+        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+      ),
+      borderData: FlBorderData(show: true),
+      lineBarsData: [
+        LineChartBarData(
+          spots: [
+            const FlSpot(0, 30),
+            const FlSpot(4, 35),
+            const FlSpot(8, 40),
+            const FlSpot(12, 38),
+            const FlSpot(16, 42),
+            const FlSpot(20, 35),
+            const FlSpot(24, 32),
+          ],
+          isCurved: true,
+          color: Colors.teal,
+          barWidth: 3,
+          dotData: FlDotData(show: false),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAnalyticsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildDateSelector(),
+          const SizedBox(height: 24),
+          _buildPollutantDistribution(),
+          const SizedBox(height: 24),
+          _buildComparisonChart(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateSelector() {
+    return Card(
+      child: ListTile(
+        title: Text(
+          'Data for ${DateFormat('MMM d, yyyy').format(_selectedDate)}',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        trailing: IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: () async {
+            final DateTime? picked = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2020),
+              lastDate: DateTime.now(),
+            );
+            if (picked != null && picked != _selectedDate) {
+              setState(() {
+                _selectedDate = picked;
+              });
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPollutantDistribution() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Pollutant Distribution',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: PieChart(
+                PieChartData(
+                  sections: [
+                    PieChartSectionData(
+                      value: 35,
+                      title: 'PM2.5',
+                      color: Colors.blue,
+                      radius: 50,
+                    ),
+                    PieChartSectionData(
+                      value: 25,
+                      title: 'PM10',
+                      color: Colors.green,
+                      radius: 50,
+                    ),
+                    PieChartSectionData(
+                      value: 20,
+                      title: 'SO2',
+                      color: Colors.orange,
+                      radius: 50,
+                    ),
+                    PieChartSectionData(
+                      value: 20,
+                      title: 'NOx',
+                      color: Colors.red,
+                      radius: 50,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildComparisonChart() {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Historical Comparison',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 100,
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(toY: 75, color: Colors.teal),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(toY: 85, color: Colors.teal),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 2,
+                      barRods: [
+                        BarChartRodData(toY: 65, color: Colors.teal),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAlertsTab() {
+    return ListView.builder(
+      itemCount: _notifications.length,
+      itemBuilder: (context, index) {
+        return Card(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListTile(
+            leading: const Icon(Icons.warning, color: Colors.orange),
+            title: Text(_notifications[index]),
+            subtitle: Text(
+              DateFormat('MMM d, yyyy HH:mm').format(DateTime.now()),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                setState(() {
+                  _notifications.removeAt(index);
+                });
+              },
+            ),
+          ),
         );
       },
-      child: Text(
-        title,
-        style: _gridItemTitleTextStyle,
-        textAlign: TextAlign.center,
+    );
+  }
+
+  Widget _buildSettingsDrawer() {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.teal,
+            ),
+            child: const Text(
+              'Settings',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications),
+            title: const Text('Notification Settings'),
+            onTap: () {
+              // Implement notification settings
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.timeline),
+            title: const Text('Data Refresh Rate'),
+            onTap: () {
+              // Implement data refresh rate settings
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.color_lens),
+            title: const Text('Theme Settings'),
+            onTap: () {
+              // Implement theme settings
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.help),
+            title: const Text('Help & Support'),
+            onTap: () {
+              // Implement help & support
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNotifications() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return ListView.builder(
+          itemCount: _notifications.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: const Icon(Icons.notification_important),
+              title: Text(_notifications[index]),
+              subtitle: Text(
+                DateFormat('MMM d, yyyy HH:mm').format(DateTime.now()),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        setState(() {
+          // Simulate new data refresh
+          _notifications.insert(0, 'Data refreshed at ${DateFormat('HH:mm:ss').format(DateTime.now())}');
+        });
+      },
+      backgroundColor: Colors.teal,
+      child: const Icon(Icons.refresh),
+    );
+  }
+}
+
+class PlaceholderPage extends StatelessWidget {
+  final String title;
+
+  const PlaceholderPage({
+    super.key,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.teal,
+      ),
+      body: Center(
+        child: Text(
+          '$title\nComing Soon',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 24,
+            color: Colors.grey,
+          ),
+        ),
       ),
     );
   }
@@ -1980,27 +2489,39 @@ class AmbientAirMonitoringPage extends StatelessWidget {
   }
 }
 
+
+
 class StackMonitoringPage extends StatefulWidget {
   @override
   StackMonitoringPageState createState() => StackMonitoringPageState();
 }
-
 class StackMonitoringData {
   final String source;
   final String asPerConsent;
   final String provided;
+  final DateTime timestamp;
+  final String status;
+  final String id;
 
   StackMonitoringData({
     required this.source,
     required this.asPerConsent,
     required this.provided,
+    required this.timestamp,
+    required this.status,
+    required this.id,
   });
 
   factory StackMonitoringData.fromJson(Map<String, dynamic> json) {
     return StackMonitoringData(
-      source: json['source'] ?? '',
-      asPerConsent: json['asPerConsent'] ?? '',
-      provided: json['provided'] ?? '',
+      source: json['source']?.toString() ?? '',  // Convert to String and provide default
+      asPerConsent: json['asPerConsent']?.toString() ?? '',
+      provided: json['provided']?.toString() ?? '',
+      timestamp: json['timestamp'] != null 
+        ? DateTime.tryParse(json['timestamp'].toString()) ?? DateTime.now()
+        : DateTime.now(),
+      status: json['status']?.toString() ?? 'Active',
+      id: json['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
     );
   }
 
@@ -2009,27 +2530,30 @@ class StackMonitoringData {
       'source': source,
       'asPerConsent': asPerConsent,
       'provided': provided,
+      'timestamp': timestamp.toIso8601String(),
+      'status': status,
+      'id': id,
     };
   }
 }
 
 class StackMonitoringPageState extends State<StackMonitoringPage> {
-  // List to store monitoring data
-  List<StackMonitoringData> _monitoringData = <StackMonitoringData>[];
-  List<StackMonitoringData> _filteredData = <StackMonitoringData>[];
-
-  // API Base URL (replace with your actual server URL)
-  final String _baseUrl = 'http://localhost:3000';
-
-  // Controllers for input fields
+  List<StackMonitoringData> _monitoringData = [];
+  List<StackMonitoringData> _filteredData = [];
+  final String _baseUrl = 'http://54.146.215.18:3000';
+  
   final TextEditingController _sourceController = TextEditingController();
   final TextEditingController _chimneyConsentController = TextEditingController();
   final TextEditingController _statusProvidedController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
-
-  // Sorting variables
+  
+  String _selectedStatus = 'Active';
+  String _filterStatus = 'All';
   bool _isAscending = true;
   String _sortColumn = 'source';
+  bool _isLoading = false;
+
+  final List<String> _statusOptions = ['Active', 'Inactive', 'Maintenance', 'Critical'];
 
   @override
   void initState() {
@@ -2037,8 +2561,17 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
     _fetchMonitoringData();
   }
 
-  // Fetch monitoring data from API
+  @override
+  void dispose() {
+    _sourceController.dispose();
+    _chimneyConsentController.dispose();
+    _statusProvidedController.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchMonitoringData() async {
+    setState(() => _isLoading = true);
     try {
       final response = await http.get(Uri.parse('$_baseUrl/stack-monitoring'));
 
@@ -2055,19 +2588,24 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
       }
     } catch (e) {
       _showErrorSnackBar('Error connecting to server');
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
-  // Method to add new monitoring data
   Future<void> _addMonitoringData() async {
     if (_validateInputs()) {
       final newData = StackMonitoringData(
         source: _sourceController.text.trim(),
         asPerConsent: _chimneyConsentController.text.trim(),
         provided: _statusProvidedController.text.trim(),
+        timestamp: DateTime.now(),
+        status: _selectedStatus,
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
       );
 
       try {
+        setState(() => _isLoading = true);
         final response = await http.post(
           Uri.parse('$_baseUrl/stack-monitoring'),
           headers: {'Content-Type': 'application/json'},
@@ -2075,13 +2613,9 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
         );
 
         if (response.statusCode == 201) {
-          final addedData = StackMonitoringData.fromJson(
-            json.decode(response.body)['data']
-          );
-
           setState(() {
-            _monitoringData.add(addedData);
-            _filteredData = _monitoringData;
+            _monitoringData.add(newData);
+            _filterData(_searchController.text);
             _clearInputFields();
           });
 
@@ -2095,11 +2629,79 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
         }
       } catch (e) {
         _showErrorSnackBar('Error connecting to server');
+      } finally {
+        setState(() => _isLoading = false);
       }
     }
   }
 
-  // Input validation method
+  Future<void> _updateMonitoringData(StackMonitoringData oldData) async {
+    if (_validateInputs()) {
+      final updatedData = StackMonitoringData(
+        id: oldData.id,
+        source: _sourceController.text.trim(),
+        asPerConsent: _chimneyConsentController.text.trim(),
+        provided: _statusProvidedController.text.trim(),
+        timestamp: DateTime.now(),
+        status: _selectedStatus,
+      );
+
+      try {
+        setState(() => _isLoading = true);
+        final response = await http.put(
+          Uri.parse('$_baseUrl/stack-monitoring/${oldData.id}'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(updatedData.toJson()),
+        );
+
+        if (response.statusCode == 200) {
+          setState(() {
+            final index = _monitoringData.indexWhere((item) => item.id == oldData.id);
+            if (index != -1) {
+              _monitoringData[index] = updatedData;
+              _filterData(_searchController.text);
+            }
+            _clearInputFields();
+          });
+
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+          _showSuccessSnackBar('Monitoring data updated successfully');
+        } else {
+          _showErrorSnackBar('Failed to update monitoring data');
+        }
+      } catch (e) {
+        _showErrorSnackBar('Error connecting to server');
+      } finally {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _deleteMonitoringData(StackMonitoringData data) async {
+    try {
+      setState(() => _isLoading = true);
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/stack-monitoring/${data.id}'),
+      );
+
+      if (response.statusCode == 200) {
+        setState(() {
+          _monitoringData.removeWhere((item) => item.id == data.id);
+          _filterData(_searchController.text);
+        });
+        _showSuccessSnackBar('Monitoring data deleted successfully');
+      } else {
+        _showErrorSnackBar('Failed to delete monitoring data');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Error connecting to server');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   bool _validateInputs() {
     if (_sourceController.text.trim().isEmpty ||
         _chimneyConsentController.text.trim().isEmpty ||
@@ -2110,112 +2712,269 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
     return true;
   }
 
-  // Show success snackbar
   void _showSuccessSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  // Show error snackbar
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
-  // Clear input fields
   void _clearInputFields() {
     _sourceController.clear();
     _chimneyConsentController.clear();
     _statusProvidedController.clear();
+    _selectedStatus = 'Active';
   }
 
-  // Search and filter method
   void _filterData(String query) {
     setState(() {
       _filteredData = _monitoringData.where((data) {
-        return data.source.toLowerCase().contains(query.toLowerCase()) ||
+        final matchesQuery = data.source.toLowerCase().contains(query.toLowerCase()) ||
                data.asPerConsent.toLowerCase().contains(query.toLowerCase()) ||
                data.provided.toLowerCase().contains(query.toLowerCase());
+        
+        final matchesStatus = _filterStatus == 'All' || data.status == _filterStatus;
+        
+        return matchesQuery && matchesStatus;
       }).toList();
     });
   }
 
-  // Sorting method
   void _sortData(String columnName) {
     setState(() {
-      _isAscending = !_isAscending;
-      _sortColumn = columnName;
+      if (_sortColumn == columnName) {
+        _isAscending = !_isAscending;
+      } else {
+        _sortColumn = columnName;
+        _isAscending = true;
+      }
 
       _filteredData.sort((a, b) {
+        var comparison = 0;
         switch (columnName) {
           case 'source':
-            return _isAscending
-                ? a.source.compareTo(b.source)
-                : b.source.compareTo(a.source);
+            comparison = a.source.compareTo(b.source);
+            break;
           case 'asPerConsent':
-            return _isAscending
-                ? a.asPerConsent.compareTo(b.asPerConsent)
-                : b.asPerConsent.compareTo(a.asPerConsent);
+            comparison = a.asPerConsent.compareTo(b.asPerConsent);
+            break;
           case 'provided':
-            return _isAscending
-                ? a.provided.compareTo(b.provided)
-                : b.provided.compareTo(a.provided);
-          default:
-            return 0;
+            comparison = a.provided.compareTo(b.provided);
+            break;
+          case 'status':
+            comparison = a.status.compareTo(b.status);
+            break;
+          case 'timestamp':
+            comparison = a.timestamp.compareTo(b.timestamp);
+            break;
         }
+        return _isAscending ? comparison : -comparison;
       });
     });
   }
 
-  // Method to show add data dialog
   void _showAddDataDialog() {
+    _clearInputFields();
+    showDialog(
+      context: context,
+      builder: (context) => _buildDataDialog('Add Monitoring Data', _addMonitoringData),
+    );
+  }
+
+  void _showEditDialog(StackMonitoringData data) {
+    _sourceController.text = data.source;
+    _chimneyConsentController.text = data.asPerConsent;
+    _statusProvidedController.text = data.provided;
+    _selectedStatus = data.status;
+    
+    showDialog(
+      context: context,
+      builder: (context) => _buildDataDialog(
+        'Edit Monitoring Data',
+        () => _updateMonitoringData(data),
+      ),
+    );
+  }
+
+  Widget _buildDataDialog(String title, VoidCallback onSave) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(Icons.add_chart, color: Colors.teal),
+          SizedBox(width: 8),
+          Text(title),
+        ],
+      ),
+      content: Container(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _sourceController,
+                decoration: InputDecoration(
+                  labelText: 'Air Pollution Source',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.source),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _chimneyConsentController,
+                decoration: InputDecoration(
+                  labelText: 'Chimney and APCS As per Consent',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.architecture),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _statusProvidedController,
+                decoration: InputDecoration(
+                  labelText: 'Status Provided',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.info_outline),
+                ),
+              ),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedStatus,
+                decoration: InputDecoration(
+                  labelText: 'Status',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.linear_scale),
+                ),
+                items: _statusOptions.map((String status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _selectedStatus = newValue;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton.icon(
+          onPressed: () => Navigator.of(context).pop(),
+          icon: Icon(Icons.cancel),
+          label: Text('Cancel'),
+        ),
+        ElevatedButton.icon(
+          onPressed: onSave,
+          icon: Icon(Icons.save),
+          label: Text('Save'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmation(StackMonitoringData data) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete this monitoring data?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _deleteMonitoringData(data);
+            },
+            child: Text('Delete'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          labelText: 'Search Monitoring Data',
+          prefixIcon: Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          filled: true,
+          fillColor: Colors.grey[100],
+        ),
+        onChanged: _filterData,
+      ),
+    );
+  }
+
+  void _showFilterDialog() {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Add Monitoring Data'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: _sourceController,
-                  decoration: const InputDecoration(
-                    labelText: 'Air Pollution Source',
-                  ),
+          title: Text('Filter Data'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<String>(
+                value: _filterStatus,
+                decoration: InputDecoration(
+                  labelText: 'Status',
+                  border: OutlineInputBorder(),
                 ),
-                TextField(
-                  controller: _chimneyConsentController,
-                  decoration: const InputDecoration(
-                    labelText: 'Chimney and APCS As per Consent',
-                  ),
-                ),
-                TextField(
-                  controller: _statusProvidedController,
-                  decoration: const InputDecoration(
-                    labelText: 'Status Provided',
-                  ),
-                ),
-              ],
-            ),
+                items: ['All', ..._statusOptions].map((String status) {
+                  return DropdownMenuItem(
+                    value: status,
+                    child: Text(status),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      _filterStatus = newValue;
+                      _filterData(_searchController.text);
+                    });
+                  }
+                },
+              ),
+            ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: _addMonitoringData,
-              child: const Text('Add Data'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Close'),
             ),
           ],
         );
@@ -2227,93 +2986,207 @@ class StackMonitoringPageState extends State<StackMonitoringPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stack Airflow Monitoring'),
+        title: Text(
+          'Stack Airflow Monitoring',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.teal,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: Icon(Icons.refresh),
             onPressed: _fetchMonitoringData,
+            tooltip: 'Refresh Data',
+          ),
+          IconButton(
+            icon: Icon(Icons.filter_list),
+            onPressed: _showFilterDialog,
+            tooltip: 'Filter Data',
           ),
         ],
       ),
       body: Column(
         children: [
-          // Search and Filter Section
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                labelText: 'Search Monitoring Data',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+          _buildSearchBar(),
+          Expanded(
+            child: _isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _buildDataTable(),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddDataDialog,
+        backgroundColor: Colors.teal,
+        icon: Icon(Icons.add),
+        label: Text('Add Data'),
+        tooltip: 'Add new monitoring data',
+      ),
+    );
+  }
+
+  Widget _buildDataTable() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: _filteredData.isEmpty
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.hourglass_empty, size: 48, color: Colors.grey), // Changed from no_data to hourglass_empty
+                    SizedBox(height: 16),
+                    Text(
+                      'No monitoring data found',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              onChanged: _filterData,
+            )
+          : DataTable(
+              sortColumnIndex: _getSortColumnIndex(_sortColumn),
+              sortAscending: _isAscending,
+              headingRowColor: MaterialStateProperty.all(Colors.teal.shade50),
+              headingTextStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.teal.shade700,
+                fontSize: 14,
+              ),
+              dataRowColor: MaterialStateProperty.resolveWith(
+                (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.selected)) {
+                    return Colors.teal.shade50;
+                  }
+                  return null;
+                },
+              ),
+              columns: [
+                _buildDataColumn('No.', null),
+                _buildDataColumn('Source', 'source'),
+                _buildDataColumn('Consent', 'asPerConsent'),
+                _buildDataColumn('Status Provided', 'provided'),
+                _buildDataColumn('Current Status', 'status'),
+                _buildDataColumn('Timestamp', 'timestamp'),
+                _buildDataColumn('Actions', null),
+              ],
+              rows: _filteredData.asMap().entries.map((entry) {
+                final int index = entry.key;
+                final data = entry.value;
+                return DataRow(
+                  cells: [
+                    DataCell(Text('${index + 1}')),
+                    DataCell(Text(data.source)),
+                    DataCell(Text(data.asPerConsent)),
+                    DataCell(Text(data.provided)),
+                    DataCell(_buildStatusCell(data.status)),
+                    DataCell(Text(
+                      DateFormat('yyyy-MM-dd HH:mm').format(data.timestamp)
+                    )),
+                    DataCell(_buildActionButtons(data)),
+                  ],
+                );
+              }).toList(),
             ),
-          ),
+    );
+  }
 
-          // Data Table
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: _filteredData.isEmpty
-                  ? const Center(child: Text('No monitoring data found'))
-                  : DataTable(
-                      sortColumnIndex: _getSortColumnIndex(_sortColumn),
-                      sortAscending: _isAscending,
-                      columns: [
-                        _buildDataColumn('No.', 'source'),
-                        _buildDataColumn('Air Pollution Source', 'source'),
-                        _buildDataColumn('Chimney and APCS As per Consent', 'asPerConsent'),
-                        _buildDataColumn('Status Provided', 'provided'),
-                      ],
-                      rows: _filteredData.asMap().entries.map((entry) {
-                        final int index = entry.key;
-                        final data = entry.value;
-                        return DataRow(
-                          cells: [
-                            DataCell(Text('${index + 1}')),
-                            DataCell(Text(data.source)),
-                            DataCell(Text(data.asPerConsent)),
-                            DataCell(Text(data.provided)),
-                          ],
-                        );
-                      }).toList(),
-                    ),
+  Widget _buildStatusCell(String status) {
+    Color statusColor;
+    IconData statusIcon;
+    
+    switch (status.toLowerCase()) {
+      case 'active':
+        statusColor = Colors.green;
+        statusIcon = Icons.check_circle;
+        break;
+      case 'inactive':
+        statusColor = Colors.grey;
+        statusIcon = Icons.cancel;
+        break;
+      case 'maintenance':
+        statusColor = Colors.orange;
+        statusIcon = Icons.build;
+        break;
+      case 'critical':
+        statusColor = Colors.red;
+        statusIcon = Icons.warning;
+        break;
+      default:
+        statusColor = Colors.blue;
+        statusIcon = Icons.info;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: statusColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: statusColor),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(statusIcon, size: 16, color: statusColor),
+          SizedBox(width: 4),
+          Text(
+            status,
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddDataDialog,
-        backgroundColor: Colors.teal,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
-  // Helper method to get sort column index
+  Widget _buildActionButtons(StackMonitoringData data) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: Icon(Icons.edit, color: Colors.blue),
+          onPressed: () => _showEditDialog(data),
+          tooltip: 'Edit',
+        ),
+        IconButton(
+          icon: Icon(Icons.delete, color: Colors.red),
+          onPressed: () => _showDeleteConfirmation(data),
+          tooltip: 'Delete',
+        ),
+      ],
+    );
+  }
+
+  DataColumn _buildDataColumn(String label, String? columnName) {
+    return DataColumn(
+      label: Text(
+        label,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      onSort: columnName == null ? null : (columnIndex, ascending) => _sortData(columnName),
+    );
+  }
+
   int _getSortColumnIndex(String columnName) {
     switch (columnName) {
       case 'source':
-        return 1; // Adjusted to match new column order
+        return 1;
       case 'asPerConsent':
         return 2;
       case 'provided':
         return 3;
+      case 'status':
+        return 4;
+      case 'timestamp':
+        return 5;
       default:
         return 1;
     }
-  }
-
-  // Method to build sortable data column
-  DataColumn _buildDataColumn(String label, String columnName) {
-    return DataColumn(
-      label: Text(label),
-      onSort: columnName == 'source' ? null : (columnIndex, ascending) => _sortData(columnName),
-    );
   }
 }
 class AmbientAirQualityStandardsPage extends StatelessWidget {
